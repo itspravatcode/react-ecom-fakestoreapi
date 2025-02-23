@@ -24,7 +24,10 @@ type Action =
   | { type: "SET_PRODUCTS"; payload: Product[] }
   | { type: "ADD_PRODUCT"; payload: Product }
   | { type: "UPDATE_PRODUCT"; payload: Product }
-  | { type: "TOGGLE_EDIT_MODE" };
+  | { type: "TOGGLE_EDIT_MODE" }
+  | { type: "LOGIN_SUCCESS"; payload: "admin" | "user" | "" }  
+  | { type: "LOGOUT" };
+
 
 const initialState: State = {
   selectedCategory: "",
@@ -54,6 +57,10 @@ const reducer = (state: State, action: Action): State => {
       };
     case "TOGGLE_EDIT_MODE":
       return { ...state, editMode: !state.editMode };
+    case "LOGIN_SUCCESS":
+      return { ...state, isAuthenticated: true, role: action.payload };
+    case "LOGOUT":
+      return { ...state, isAuthenticated: false, role: "" };
     default:
       return state;
   }
@@ -63,6 +70,8 @@ type GlobalContextProps = {
   state: State;
   dispatch: React.Dispatch<Action>;
   fetchProducts: () => Promise<void>;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => void;
 };
 
 export const GlobalContext = createContext<GlobalContextProps | undefined>(undefined);
@@ -84,12 +93,39 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
     }
   };
 
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch("https://fakestoreapi.com/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      console.log("Login Successful:", data);
+
+      dispatch({ type: "LOGIN_SUCCESS", payload: "admin" }); // Defaulting to admin, modify as needed
+      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
+    }
+  };
+
+  const logout = () => {
+    dispatch({ type: "LOGOUT" });
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
   return (
-    <GlobalContext.Provider value={{ state, dispatch, fetchProducts }}>
+    <GlobalContext.Provider value={{ state, dispatch, fetchProducts, login, logout }}>
       {children}
     </GlobalContext.Provider>
   );
