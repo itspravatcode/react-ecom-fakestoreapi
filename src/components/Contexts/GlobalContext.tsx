@@ -140,6 +140,8 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
     fetchProducts();
   }, []);
 
+  
+
   return (
     <GlobalContext.Provider value={{ state, dispatch, fetchProducts, login, logout }}>
       {children}

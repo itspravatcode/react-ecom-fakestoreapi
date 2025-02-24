@@ -1,5 +1,5 @@
 import React, { useState, useContext, ChangeEvent, FormEvent } from "react";
-import { GlobalContext } from "./GlobalContext";
+import { GlobalContext } from "../Contexts/GlobalContext";
 
 interface Product {
   id: number;
@@ -41,12 +41,28 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const newProduct = { ...product, id: Date.now() };
-    dispatch({ type: "ADD_PRODUCT", payload: newProduct });
-    onClose();
+  
+    try {
+      const response = await fetch("https://fakestoreapi.com/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to add product");
+      }
+  
+      const newProduct = await response.json();
+      dispatch({ type: "ADD_PRODUCT", payload: newProduct });
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

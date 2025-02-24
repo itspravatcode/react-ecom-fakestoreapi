@@ -1,7 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { GlobalContext } from "./GlobalContext";
-import UpdateProductModal from "./UpdateProductModal";
+import { GlobalContext } from "../Contexts/GlobalContext";
+import { CartContext } from "../Contexts/CartContext";
+import UpdateProductModal from "../Modals/UpdateProductModal";
 
 type Product = {
   id: number;
@@ -12,24 +13,23 @@ type Product = {
   image: string;
 };
 
-// type GlobalContextType = {
-//   state: {
-//     priceRange: [number, number];
-//     products: Product[];
-//     editMode: boolean;
-//   };
-//   dispatch: React.Dispatch<{ type: string; payload?: any }>;
-// };
-
 const Products = () => {
   const { categoryName } = useParams<{ categoryName?: string }>();
   const context = useContext(GlobalContext);
+  const cartContext = useContext(CartContext);
 
-  if (!context) {
-    throw new Error("Products must be used within a GlobalProvider");
+  if (!context || !cartContext) {
+    throw new Error("Products must be used within a provider");
   }
 
   const { state, dispatch } = context;
+  const { dispatch: cartDispatch } = cartContext;
+
+  // ✅ Store cartDispatch in useRef to prevent re-renders
+  const cartDispatchRef = useRef(cartDispatch);
+  useEffect(() => {
+    cartDispatchRef.current = cartDispatch;
+  }, [cartDispatch]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
@@ -121,7 +121,21 @@ const Products = () => {
                 </button>
               </div>
             ) : (
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onClick={() => {
+                  cartDispatchRef.current({
+                    type: "ADD_TO_CART",
+                    payload: {
+                      id: product.id,
+                      title: product.title,
+                      price: product.price,
+                      image: product.image,
+                      quantity: 1,
+                    },
+                  });
+                }}
+              >
                 Add to Cart
               </button>
             )}

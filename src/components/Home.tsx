@@ -1,5 +1,5 @@
-import Products from "./Products";
-import Filters from "./Filters";
+import Products from "./Product/Products";
+import Filters from "./Product/Filters";
 import Navbar from "./Navbar";
 
 const Home = () => {

@@ -2,21 +2,21 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 
-import { GlobalProvider } from "./components/GlobalContext";
-
+import { GlobalProvider } from "./components/Contexts/GlobalContext";
+import Cart from "./components/Cart";
+import { CartProvider } from "./components/Contexts/CartContext";
 
 function App() {
   return (
-    <GlobalProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/category/:categoryName" element={<Home />} />
-          
+  
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/category/:categoryName" element={<Home />} />
+            <Route path="/cart" element={<Cart />} />
+          </Routes>
+        </Router>
 
-        </Routes>
-      </Router>
-    </GlobalProvider>
   );
 }
 

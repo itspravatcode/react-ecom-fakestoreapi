@@ -1,0 +1,106 @@
+// import { useContext } from "react";
+// import { CartContext } from "./Contexts/CartContext";
+// import Navbar from "./Navbar";
+
+// const Cart = () => {
+
+//   const cartContext = useContext(CartContext);
+
+//   if (!cartContext) {
+//     throw new Error("Cart must be used within a CartProvider");
+//   }
+
+//   const { state, dispatch } = cartContext;
+
+//   return (<>
+//   <Navbar />
+//   <div className="p-6">
+//       <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
+//       {state.cart.length === 0 ? (
+//         <p>Your cart is empty.</p>
+//       ) : (
+//         <div>
+//           {state.cart.map((item) => (
+//             <div key={item.id} className="flex justify-between items-center p-4 border-b">
+//               <img src={item.image} alt={item.title} className="w-16 h-16 object-contain" />
+//               <h3 className="text-lg">{item.title}</h3>
+//               <p>${item.price} x {item.quantity}</p>
+//               <button
+//                 onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: item.id })}
+//                 className="bg-red-500 text-white px-3 py-1 rounded"
+//               >
+//                 Remove
+//               </button>
+//             </div>
+//           ))}
+//           <button
+//             onClick={() => dispatch({ type: "CLEAR_CART" })}
+//             className="bg-gray-700 text-white px-4 py-2 rounded mt-4"
+//           >
+//             Clear Cart
+//           </button>
+//         </div>
+//       )}
+//     </div></>
+    
+//   );
+// };
+
+// export default Cart;
+
+import { useContext } from "react";
+import { CartContext } from "./Contexts/CartContext";
+import Navbar from "./Navbar";
+
+const Cart = () => {
+  const cartContext = useContext(CartContext);
+  if (!cartContext) throw new Error("Cart must be used within a CartProvider");
+
+  const { state, dispatch } = cartContext;
+
+  const removeFromCart = (id: number) => {
+    fetch(`https://fakestoreapi.com/carts/${id}`, { method: "DELETE" }) // Fake API doesn't support DELETE, but this is a placeholder
+      .then(() => dispatch({ type: "REMOVE_FROM_CART", payload: id }));
+  };
+
+  const clearCart = () => {
+    fetch("https://fakestoreapi.com/carts/1", { method: "DELETE" }) // Replace `1` with user ID
+      .then(() => dispatch({ type: "CLEAR_CART" }));
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
+        {state.cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <div>
+            {state.cart.map((item) => (
+              <div key={item.id} className="flex justify-between items-center p-4 border-b">
+                <img src={item.image} alt={item.title} className="w-16 h-16 object-contain" />
+                <h3 className="text-lg">{item.title}</h3>
+                <p>${item.price} x {item.quantity}</p>
+                <button
+                  onClick={() => removeFromCart(item.id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={clearCart}
+              className="bg-gray-700 text-white px-4 py-2 rounded mt-4"
+            >
+              Clear Cart
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default Cart;

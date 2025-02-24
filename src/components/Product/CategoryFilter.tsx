@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { GlobalContext } from "./GlobalContext";
+import { GlobalContext } from "../Contexts/GlobalContext";
 
 type GlobalContextType = {
   dispatch: React.Dispatch<{ type: string; payload?: string }>;

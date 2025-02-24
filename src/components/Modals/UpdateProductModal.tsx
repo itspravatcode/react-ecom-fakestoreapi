@@ -1,5 +1,5 @@
 import React, { useState, useContext, ChangeEvent, FormEvent } from "react";
-import { GlobalContext } from "./GlobalContext";
+import { GlobalContext } from "../Contexts/GlobalContext";
 
 interface Product {
   id: number;
