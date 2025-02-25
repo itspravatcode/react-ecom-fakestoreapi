@@ -1,19 +1,8 @@
 import axios from "axios";
-import { createContext, useReducer, useEffect, ReactNode } from "react";
+import { createContext, useReducer, useEffect, ReactNode, useCallback } from "react";
 
-type User = {
-  username: string;
-  token: string;
-};
-
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-};
+type User = { username: string; token: string };
+type Product = { id: number; title: string; price: number; description: string; category: string; image: string };
 
 type State = {
   selectedCategory: string;
@@ -58,9 +47,7 @@ const reducer = (state: State, action: Action): State => {
     case "UPDATE_PRODUCT":
       return {
         ...state,
-        products: state.products.map((prod) =>
-          prod.id === action.payload.id ? action.payload : prod
-        ),
+        products: state.products.map((prod) => (prod.id === action.payload.id ? action.payload : prod)),
       };
     case "TOGGLE_EDIT_MODE":
       return { ...state, editMode: !state.editMode };
@@ -88,62 +75,40 @@ type GlobalContextProps = {
 
 export const GlobalContext = createContext<GlobalContextProps | undefined>(undefined);
 
-type GlobalProviderProps = {
-  children: ReactNode;
-};
+type GlobalProviderProps = { children: ReactNode };
 
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const res = await axios.get<Product[]>("https://fakestoreapi.com/products");
       dispatch({ type: "SET_PRODUCTS", payload: res.data });
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
-
-  };
+  }, []);
 
   const login = async (username: string, password: string, role: "admin" | "user"): Promise<boolean> => {
     try {
-      const res = await axios.post("https://fakestoreapi.com/auth/login", {
-        username,
-        password,
-      }, {
-        headers: { "Content-Type": "application/json" }
-      });
+      const { data } = await axios.post("https://fakestoreapi.com/auth/login", { username, password });
 
-      if (res.status !== 200) {
-        return false;
-      }
-
-      const data = res.data;
       if (data.token) {
-        dispatch({
-          type: "LOGIN_SUCCESS",
-          payload: { role, user: { username, token: data.token } },
-        });
+        dispatch({ type: "LOGIN_SUCCESS", payload: { role, user: { username, token: data.token } } });
         return true;
       }
-
       return false;
     } catch (error) {
       console.error("Login failed:", error);
       return false;
     }
-
   };
 
-  const logout = () => {
-    dispatch({ type: "LOGOUT" });
-  };
+  const logout = () => dispatch({ type: "LOGOUT" });
 
   useEffect(() => {
     fetchProducts();
-  }, []);
-
-  
+  }, [fetchProducts]);
 
   return (
     <GlobalContext.Provider value={{ state, dispatch, fetchProducts, login, logout }}>

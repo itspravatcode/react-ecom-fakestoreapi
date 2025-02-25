@@ -19,6 +19,7 @@ const useProducts = (categoryName: string | undefined, state: any, dispatch: any
 
   const { dispatch: cartDispatch } = cartContext;
   const cartDispatchRef = useRef(cartDispatch);
+
   useEffect(() => {
     cartDispatchRef.current = cartDispatch;
   }, [cartDispatch]);
@@ -67,6 +68,13 @@ const useProducts = (categoryName: string | undefined, state: any, dispatch: any
       });
   }, [categoryName, state.priceRange, state.products]);
 
+  // **New function to add a product**
+  const addProduct = (newProduct: Product) => {
+    const updatedProducts = [...products, newProduct];
+    setProducts(updatedProducts);
+    dispatch({ type: "SET_PRODUCTS", payload: updatedProducts });
+  };
+
   const deleteProduct = async (id: number) => {
     try {
       await axios.delete(`https://fakestoreapi.com/products/${id}`);
@@ -75,11 +83,11 @@ const useProducts = (categoryName: string | undefined, state: any, dispatch: any
       console.error("Error deleting product:", error);
     }
   };
-  
 
   return {
     cartDispatch: cartDispatchRef.current,
     products,
+
     deleteProduct,
     showUpdateModal,
     setShowUpdateModal,

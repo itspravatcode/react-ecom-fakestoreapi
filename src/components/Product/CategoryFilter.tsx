@@ -9,8 +9,8 @@ type GlobalContextType = {
 
 const CategoryFilter: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
-  const context = useContext(GlobalContext) as GlobalContextType;
-  const navigate = useNavigate();
+  const context = useContext(GlobalContext);
+  const navigate = useNavigate(); // Ensure this is defined inside the component
 
   if (!context) {
     throw new Error("CategoryFilter must be used within a GlobalProvider");
@@ -24,9 +24,9 @@ const CategoryFilter: React.FC = () => {
         const res = await axios.get("https://fakestoreapi.com/products/categories");
         setCategories(res.data);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch categories:", error);
+        setCategories([]);
       }
-  
     };
 
     fetchCategories();
@@ -34,7 +34,7 @@ const CategoryFilter: React.FC = () => {
 
   const handleCategoryClick = (category: string) => {
     dispatch({ type: "SET_CATEGORY", payload: category });
-    navigate(category === "" ? "/" : `/category/${category}`);
+    navigate(category ? `/category/${category}` : "/"); // Ensure navigate is being used correctly
   };
 
   return (

@@ -9,23 +9,14 @@ const Cart = () => {
 
   const { state, dispatch } = cartContext;
 
-  const removeFromCart = async (id: number) => {
-    try {
-      await axios.delete(`https://fakestoreapi.com/carts/${id}`);
-      dispatch({ type: "REMOVE_FROM_CART", payload: id });
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-    }
+  const removeFromCart = (id: number) => {
+    dispatch({ type: "REMOVE_FROM_CART", payload: id });
   };
+  
 
 
-  const clearCart = async () => {
-    try {
-      await axios.delete("https://fakestoreapi.com/carts/1");
-      dispatch({ type: "CLEAR_CART" });
-    } catch (error) {
-      console.error("Error clearing cart:", error);
-    }
+  const clearCart = () => {
+    dispatch({ type: "CLEAR_CART" });
   };
   
 

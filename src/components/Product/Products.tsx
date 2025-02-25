@@ -1,9 +1,10 @@
+import { useState } from "react";
+import useProducts from "./useProducts";
+import ProductList from "./ProductList";
 import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { GlobalContext } from "../Contexts/GlobalContext";
 import { CartContext } from "../Contexts/CartContext";
-import ProductList from "./ProductList";
-import useProducts from "./useProducts";
 
 const Products = () => {
   const { categoryName } = useParams<{ categoryName?: string }>();
@@ -15,14 +16,25 @@ const Products = () => {
   }
 
   const { state, dispatch } = context;
-  const { cartDispatch, products, deleteProduct, showUpdateModal, setShowUpdateModal, selectedProduct, setSelectedProduct } =
-    useProducts(categoryName, state, dispatch);
+  const {
+    cartDispatch,
+    products,
+    deleteProduct,
+    showUpdateModal,
+    setShowUpdateModal,
+    selectedProduct,
+    setSelectedProduct,
+  } = useProducts(categoryName, state, dispatch);
+
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">
         {categoryName ? `Category: ${categoryName}` : "All Products"}
       </h2>
+
+
+
       <ProductList
         products={products}
         editMode={state.editMode}

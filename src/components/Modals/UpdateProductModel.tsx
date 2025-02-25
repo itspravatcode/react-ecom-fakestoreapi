@@ -40,22 +40,14 @@ const UpdateProductModal: React.FC<UpdateProductModalProps> = ({ product, onClos
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.put(`https://fakestoreapi.com/products/${product.id}`, updatedProduct, {
-        headers: { "Content-Type": "application/json" }
-      });
-
-      if (res.status !== 200) {
-        throw new Error(`Failed to update product: ${res.statusText}`);
-      }
-
-      const data: Product = res.data;
+      const { data } = await axios.put(`https://fakestoreapi.com/products/${product.id}`, updatedProduct);
       dispatch({ type: "UPDATE_PRODUCT", payload: data });
       onClose();
     } catch (error) {
       console.error("Error updating product:", error);
     }
-
   };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

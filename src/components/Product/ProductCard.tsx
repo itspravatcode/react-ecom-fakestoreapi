@@ -1,13 +1,6 @@
 import UpdateProductModal from "../Modals/UpdateProductModel";
+import {Product }from "./Product";
 
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-};
 
 interface ProductCardProps {
   product: Product;

@@ -1,4 +1,4 @@
-import { createContext, useReducer, ReactNode, useEffect } from "react";
+import { createContext, useReducer, ReactNode} from "react";
 import axios from "axios";
 
 type CartItem = { id: number; title: string; price: number; image: string; quantity: number };
@@ -39,18 +39,26 @@ export const CartContext = createContext<{
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  const addToCart = (userId: number, productId: number, quantity: number) => {
-    dispatch({ type: "ADD_TO_CART", payload: { id: productId, title: "Unknown", price: 0, image: "", quantity } });
+  const addToCart = async (userId: number, productId: number, quantity: number) => {
+    try {
+      const { data } = await axios.get(`https://fakestoreapi.com/products/${productId}`);
+      const product = { id: data.id, title: data.title, price: data.price, image: data.image, quantity };
   
-    axios
-      .post("https://fakestoreapi.com/carts", {
+      dispatch({ type: "ADD_TO_CART", payload: product });
+  
+      axios.post("https://fakestoreapi.com/carts", {
         userId,
         date: new Date().toISOString().split("T")[0],
-        products: state.cart.map(({ id, quantity }) => ({ productId: id, quantity })),
+        products: [...state.cart, { productId: data.id, quantity }],
       })
       .then(response => console.log("Cart updated:", response.data))
       .catch(error => console.error("Error adding to cart:", error));
+  
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
   };
+  
   
 
   return <CartContext.Provider value={{ state, dispatch, addToCart }}>{children}</CartContext.Provider>;

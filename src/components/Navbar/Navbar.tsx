@@ -3,6 +3,7 @@ import { GlobalContext } from "../Contexts/GlobalContext";
 import NavbarLinks from "./NavbarLinks";
 import LoginModal from "../Modals/LoginModal";
 import AddProductModal from "../Modals/AddProductModal";
+import { Product } from "../Product/Product";
 
 const Navbar: React.FC = () => {
   const context = useContext(GlobalContext);
@@ -37,7 +38,12 @@ const Navbar: React.FC = () => {
         <LoginModal onClose={() => setShowUserModal(false)} role="user" />
       )}
       {showAddProductModal && (
-        <AddProductModal onClose={() => setShowAddProductModal(false)} />
+        <AddProductModal
+          onClose={() => setShowAddProductModal(false)}
+          addProduct={(product: Product) =>
+            dispatch({ type: "ADD_PRODUCT", payload: product })
+          }
+        />
       )}
     </nav>
   );

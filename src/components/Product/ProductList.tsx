@@ -1,13 +1,7 @@
 import ProductCard from "./ProductCard";
+import {Product }from "./Product";
 
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-};
+
 
 interface ProductListProps {
   products: Product[];
@@ -32,19 +26,24 @@ const ProductList = ({
 }: ProductListProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          editMode={editMode}
-          cartDispatch={cartDispatch}
-          deleteProduct={deleteProduct}
-          showUpdateModal={showUpdateModal}
-          setShowUpdateModal={setShowUpdateModal}
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
-        />
-      ))}
+      {products?.length ? (
+  products.map((product) => (
+    <ProductCard
+      key={product.id}
+      product={product}
+      editMode={editMode}
+      cartDispatch={cartDispatch}
+      deleteProduct={deleteProduct}
+      showUpdateModal={showUpdateModal}
+      setShowUpdateModal={setShowUpdateModal}
+      selectedProduct={selectedProduct}
+      setSelectedProduct={setSelectedProduct}
+    />
+  ))
+) : (
+  <p>No products available.</p>
+)}
+
     </div>
   );
 };
