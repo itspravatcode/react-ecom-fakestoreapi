@@ -1,6 +1,7 @@
 import React, { useState, useContext, ChangeEvent, FormEvent } from "react";
 import { GlobalContext } from "../Contexts/GlobalContext";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 interface Product {
   id: number;
@@ -18,6 +19,14 @@ type GlobalContextType = {
   dispatch: React.Dispatch<{ type: string; payload?: Product }>;
 };
 
+const fetchCategories = async () => {
+  const res = await fetch("https://fakestoreapi.com/products/categories");
+  if (!res.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+  return res.json();
+};
+
 const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
   const context = useContext(GlobalContext) as GlobalContextType;
   if (!context) {
@@ -25,7 +34,6 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
   }
 
   const { dispatch } = context;
-
   const [product, setProduct] = useState<Product>({
     id: 0,
     title: "",
@@ -34,7 +42,12 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
     image: "",
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setProduct((prev) => ({
       ...prev,
@@ -48,20 +61,17 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
       const res = await axios.post("https://fakestoreapi.com/products", product, {
         headers: { "Content-Type": "application/json" }
       });
-
+      
       if (res.status !== 200 && res.status !== 201) {
         throw new Error("Failed to add product");
       }
 
-      const newProduct = res.data;
-      dispatch({ type: "ADD_PRODUCT", payload: newProduct });
+      dispatch({ type: "ADD_PRODUCT", payload: res.data });
       onClose();
     } catch (error) {
       console.error(error);
     }
-
   };
-  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -86,15 +96,22 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
             className="w-full p-2 border rounded"
             required
           />
-          <input
-            type="text"
+          <select
             name="category"
-            placeholder="Category"
             value={product.category}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             required
-          />
+          >
+            <option value="">Select Category</option>
+            {isLoading ? (
+              <option disabled>Loading...</option>
+            ) : (
+              categories.map((cat: string) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))
+            )}
+          </select>
           <input
             type="text"
             name="image"
