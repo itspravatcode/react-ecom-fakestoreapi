@@ -1,4 +1,5 @@
 import { createContext, useReducer, ReactNode, useEffect } from "react";
+import axios from "axios";
 
 type CartItem = { id: number; title: string; price: number; image: string; quantity: number };
 type CartState = { cart: CartItem[] };
@@ -40,20 +41,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = (userId: number, productId: number, quantity: number) => {
     dispatch({ type: "ADD_TO_CART", payload: { id: productId, title: "Unknown", price: 0, image: "", quantity } });
-
-    fetch("https://fakestoreapi.com/carts", {
-      method: "POST",
-      body: JSON.stringify({
+  
+    axios
+      .post("https://fakestoreapi.com/carts", {
         userId,
         date: new Date().toISOString().split("T")[0],
-        products: state.cart.map(({ id, quantity }) => ({ productId: id, quantity })), 
-      }),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then(res => res.json())
-      .then(json => console.log("Cart updated:", json))
+        products: state.cart.map(({ id, quantity }) => ({ productId: id, quantity })),
+      })
+      .then(response => console.log("Cart updated:", response.data))
       .catch(error => console.error("Error adding to cart:", error));
   };
+  
 
   return <CartContext.Provider value={{ state, dispatch, addToCart }}>{children}</CartContext.Provider>;
 };

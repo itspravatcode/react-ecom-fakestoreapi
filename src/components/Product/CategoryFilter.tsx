@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "../Contexts/GlobalContext";
+import axios from "axios";
 
 type GlobalContextType = {
   dispatch: React.Dispatch<{ type: string; payload?: string }>;
@@ -20,13 +21,12 @@ const CategoryFilter: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("https://fakestoreapi.com/products/categories");
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const json = await res.json();
-        setCategories(json);
+        const res = await axios.get("https://fakestoreapi.com/products/categories");
+        setCategories(res.data);
       } catch (error) {
         console.error(error);
       }
+  
     };
 
     fetchCategories();

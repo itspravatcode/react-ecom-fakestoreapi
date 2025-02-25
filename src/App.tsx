@@ -3,7 +3,7 @@ import "./App.css";
 import Home from "./components/Home";
 
 import { GlobalProvider } from "./components/Contexts/GlobalContext";
-import Cart from "./components/Cart";
+import Cart from "./components/Product/Cart";
 import { CartProvider } from "./components/Contexts/CartContext";
 
 function App() {

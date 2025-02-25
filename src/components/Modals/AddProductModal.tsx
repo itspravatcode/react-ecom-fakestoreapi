@@ -1,5 +1,6 @@
 import React, { useState, useContext, ChangeEvent, FormEvent } from "react";
 import { GlobalContext } from "../Contexts/GlobalContext";
+import axios from "axios";
 
 interface Product {
   id: number;
@@ -43,24 +44,22 @@ const AddProductModal: React.FC<AddProductModalProps> = ({ onClose }) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
     try {
-      const response = await fetch("https://fakestoreapi.com/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
+      const res = await axios.post("https://fakestoreapi.com/products", product, {
+        headers: { "Content-Type": "application/json" }
       });
-  
-      if (!response.ok) {
+
+      if (res.status !== 200 && res.status !== 201) {
         throw new Error("Failed to add product");
       }
-  
-      const newProduct = await response.json();
+
+      const newProduct = res.data;
       dispatch({ type: "ADD_PRODUCT", payload: newProduct });
       onClose();
     } catch (error) {
       console.error(error);
     }
+
   };
   
 

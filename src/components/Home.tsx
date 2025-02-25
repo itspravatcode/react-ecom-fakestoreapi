@@ -1,6 +1,6 @@
 import Products from "./Product/Products";
 import Filters from "./Product/Filters";
-import Navbar from "./Navbar";
+import Navbar from "./Navbar/Navbar";
 
 const Home = () => {
   return (

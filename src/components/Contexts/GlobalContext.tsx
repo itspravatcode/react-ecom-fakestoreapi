@@ -1,3 +1,4 @@
+import axios from "axios";
 import { createContext, useReducer, useEffect, ReactNode } from "react";
 
 type User = {
@@ -96,27 +97,28 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("https://fakestoreapi.com/products");
-      const data: Product[] = await res.json();
-      dispatch({ type: "SET_PRODUCTS", payload: data });
+      const res = await axios.get<Product[]>("https://fakestoreapi.com/products");
+      dispatch({ type: "SET_PRODUCTS", payload: res.data });
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
+
   };
 
   const login = async (username: string, password: string, role: "admin" | "user"): Promise<boolean> => {
     try {
-      const response = await fetch("https://fakestoreapi.com/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+      const res = await axios.post("https://fakestoreapi.com/auth/login", {
+        username,
+        password,
+      }, {
+        headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) {
+      if (res.status !== 200) {
         return false;
       }
 
-      const data = await response.json();
+      const data = res.data;
       if (data.token) {
         dispatch({
           type: "LOGIN_SUCCESS",
@@ -130,6 +132,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
       console.error("Login failed:", error);
       return false;
     }
+
   };
 
   const logout = () => {
